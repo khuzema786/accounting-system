@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  backend:    
+    build:
+      context: "./backend"
+      dockerfile: Dockerfile
+    environment:
+      APP_PORT: 3001
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: accounting
+      DB_SCHEMA: account_app
+      DB_PORT: 5432
+    ports: 
+      - 3001:3001
+    volumes:
+      - ./backend/src:/app/src:rw
+    depends_on:
+      - db
+  
+  frontend:
+    build:
+      context: "./frontend"
+      dockerfile: Dockerfile    
+    ports: 
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src:rw
+      - ./frontend/public:/app/public:rw
+    depends_on:
+      - backend
+  
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: accounting
+    ports:
+      - "5432:5432"
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+      - ./migrations/pre-init.sql:/docker-entrypoint-initdb.d/0-pre-init.sql
+      - ./migrations/post-init.sql:/docker-entrypoint-initdb.d/1-post-init.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "9201:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
+    depends_on:
+      - db
+
+volumes:
+  local_pgdata:
+  pgadmin-data:
