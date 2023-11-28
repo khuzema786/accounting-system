@@ -104,7 +104,8 @@ const constructAccountTree = async (accounts, output) => {
     const { rows: accounts } = await pool.query(
       `SELECT * FROM ${dbSchema}.account WHERE company_id = $1 AND id = $2`,
       [company_id]);
-      constructAccountTree
+      let output[]
+      constructAccountTree(newAccounts, { ... output,  })
   }
 }
 
