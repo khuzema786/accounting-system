@@ -1,14 +1,6 @@
-const Pool = require("pg").Pool;
-const db_schema = process.env["DB_SCHEMA"];
-const pool = new Pool({
-  user: process.env["DB_USER"],
-  host: process.env["DB_HOST"],
-  database: process.env["DB_NAME"],
-  password: process.env["DB_PASSWORD"],
-  port: process.env["DB_PORT"],
-});
 
-const getUsers = (request, response) => {
+
+const findOne = (table, conditions) => {
   pool.query(
     `SELECT * FROM ${db_schema}.users ORDER BY id ASC`,
     (error, results) => {
@@ -36,7 +28,6 @@ const getUserById = (request, response) => {
 };
 
 const createUser = (request, response) => {
-  const { name, email } = request.body;
 
   pool.query(
     `INSERT INTO ${db_schema}.users (name, email) VALUES ($1, $2)`,

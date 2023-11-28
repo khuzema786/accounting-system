@@ -234,8 +234,33 @@ VALUES
         'CM'
     );
 
+CREATE TABLE account_app.salesman (
+    id uuid DEFAULT uuid_generate_v4(),
+    company_id uuid NOT NULL,
+    name text NOT NULL,
+    commision_percentage int NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (company_id) REFERENCES account_app.company(id)
+);
+
+INSERT INTO
+    account_app.salesman (
+        id,
+        company_id,
+        name,
+        commision_percentage
+    )
+VALUES
+    (
+        '703997eb-6919-4857-8e04-2f968974c20e',
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        'Food Seller',
+        0
+    );
+
 CREATE TABLE account_app.item (
     id uuid DEFAULT uuid_generate_v4(),
+    company_id uuid NOT NULL,
     name text NOT NULL,
     type text,
     detail text NOT NULL,
@@ -243,19 +268,21 @@ CREATE TABLE account_app.item (
     last_selling_price double precision NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (company_id) REFERENCES account_app.company(id)
 );
 
 INSERT INTO
-    account_app.item (id, name, type, detail, lpp, lsp)
+    account_app.item (id, company_id, name, type, detail, last_purchase_price, last_selling_price)
 VALUES
     (
         '1e1661e2-1297-494f-8a95-d8574e7c3df0',
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         'Buffalo',
         'Food',
         '250ml energy drink',
-        5.00,
-        10.00,
+        3100.00,
+        3100.00
     );
 
 CREATE TABLE account_app.account (
@@ -266,152 +293,168 @@ CREATE TABLE account_app.account (
     name text NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
+    PRIMARY KEY (id)
 );
 
 -- Assets
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         1,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
         '{14, 15, 17, 18}',
         'Assets'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         14,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
         '{141, 142}',
         'Current Asset'
     ),
     (
         141,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         14,
         NULL,
         'PDC Recievables'
     ),
-    (142, 14, NULL, 'VAT (Input Purchases)');
+    (142, '464c48c1-463c-425d-bdfa-85435524fcdc', 14, NULL, 'VAT (Input Purchases)');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         15,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
         '{151, 152, 153}',
         'Cash & Bank'
     ),
     (
         151,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         15,
         NULL,
         'Cash'
     ),
-    (152, 15, NULL, 'Axis'),
-    (153, 15, NULL, 'HDFC');
+    (152, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'Axis'),
+    (153, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'HDFC');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         17,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
         '{171, 172}',
         'Customer'
     ),
     (
         171,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         17,
         NULL,
         'Client 1'
     ),
-    (172, 17, NULL, 'Client 2');
+    (172, '464c48c1-463c-425d-bdfa-85435524fcdc', 17, NULL, 'Client 2');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         18,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
         '{181, 182}',
         'Customer'
     ),
     (
         181,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         18,
         NULL,
         'Ebrahim'
     ),
-    (182, 18, NULL, 'Tajik');
+    (182, '464c48c1-463c-425d-bdfa-85435524fcdc', 18, NULL, 'Tajik');
 
 -- Liabilities
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         2,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
         '{22}',
         'Liabilities'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         22,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         2,
         '{221, 222, 223}',
         'Current Liabilities'
     ),
     (
         221,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         22,
         NULL,
         'PDC Payables'
     ),
-    (222, 22, NULL, 'VAT (Output Sales)'),
-    (223, 22, NULL, 'FTA (VAT)');
+    (222, '464c48c1-463c-425d-bdfa-85435524fcdc', 22, NULL, 'VAT (Output Sales)'),
+    (223, '464c48c1-463c-425d-bdfa-85435524fcdc', 22, NULL, 'FTA (VAT)');
 
 -- Vendor
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         23,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         2,
         '{231, 232}',
         'Vendor'
     ),
     (
         231,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         23,
         NULL,
         'Vendor 1'
     ),
-    (232, 23, NULL, 'Vendor 2');
+    (232, '464c48c1-463c-425d-bdfa-85435524fcdc', 23, NULL, 'Vendor 2');
 
 -- Inventory
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         3,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
         '{31}',
         'Inventory'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         31,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         3,
         NULL,
         'Stock in Hand'
@@ -419,219 +462,190 @@ VALUES
 
 -- Income
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         4,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
         '{41}',
         'Income'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         41,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         4,
         '{411}',
         'Sales'
     ),
-    (411, 41, NULL, 'Sales');
+    (411, '464c48c1-463c-425d-bdfa-85435524fcdc', 41, NULL, 'Sales');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         46,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         4,
         '{461}',
         'Other Incomes'
     ),
-    (461, 46, NULL, 'Discounts');
+    (461, '464c48c1-463c-425d-bdfa-85435524fcdc', 46, NULL, 'Discounts');
 
 -- Expenses
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         5,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
         '{51, 52}',
         'Expenses'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         51,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         '{511}',
         'Purchase'
     ),
-    (511, 51, NULL, 'Purchase');
+    (511, '464c48c1-463c-425d-bdfa-85435524fcdc', 51, NULL, 'Purchase');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         52,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         '{521, 522, 523, 524}',
         'Cost of Sales'
     ),
-    (521, 52, NULL, 'Discounts'),
-    (522, 52, NULL, 'Customs'),
-    (523, 52, NULL, 'Freight'),
-    (524, 52, NULL, ' Transport');
+    (521, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Discounts'),
+    (522, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Customs'),
+    (523, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Freight'),
+    (524, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, ' Transport');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         53,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
         'Direct Expense'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         54,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         '{541, 542, 543, 544}',
         'Administration'
     ),
-    (541, 54, NULL, 'Salary'),
-    (542, 54, NULL, 'Interest'),
-    (543, 54, NULL, 'Visa'),
-    (544, 54, NULL, ' Advertisement');
+    (541, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Salary'),
+    (542, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Interest'),
+    (543, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Visa'),
+    (544, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, ' Advertisement');
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         55,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
         'VAT'
     );
 
 INSERT INTO
-    account_app.account (id, parent_id, children_id, name)
+    account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
         56,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
         'Bad Debts'
     );
 
-CREATE TABLE account_app.journal_voucher (
-    id uuid DEFAULT uuid_generate_v4(),
-    company_id uuid NOT NULL,
-    project_id uuid NOT NULL,
-    ref text NOT NULL,
-    narration text NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES account_app.project(id)
-);
-
-CREATE TABLE account_app.sales_voucher (
-    id uuid DEFAULT uuid_generate_v4(),
-    company_id uuid NOT NULL,
-    project_id uuid NOT NULL,
-    invoice text NOT NULL,
-    ref text NOT NULL,
-    narration text NOT NULL,
-    amount double precision NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES account_app.project(id)
-);
-
-CREATE TABLE account_app.purchase_voucher (
-    id uuid DEFAULT uuid_generate_v4(),
-    company_id uuid NOT NULL,
-    voucher_no INT AUTOINCREMENT NOT NULL,
-    project_id uuid NOT NULL,
-    invoice text NOT NULL,
-    ref text NOT NULL,
-    narration text NOT NULL,
-    discount_amt double precision NOT NULL,
-    vat_amt double precision NOT NULL,
-    amount double precision NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES account_app.project(id)
-);
-
-CREATE TABLE account_app.reciept_voucher (
-    id uuid DEFAULT uuid_generate_v4(),
-    company_id uuid NOT NULL,
-    project_id uuid NOT NULL,
-    invoice text NOT NULL,
-    ref text NOT NULL,
-    narration text NOT NULL,
-    bank text NOT NULL,
-    cheque text NOT NULL,
-    cheque_date date NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES account_app.project(id)
-);
-
-CREATE TABLE account_app.salesman (
-    id uuid DEFAULT uuid_generate_v4(),
-    company_id uuid NOT NULL,
-    name text NOT NULL,
-    commision_percentage int NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE account_app.transaction_item (
-    id uuid DEFAULT uuid_generate_v4(),
-    voucher_id uuid NOT NULL,
-    company_id uuid NOT NULL,
-    description text NOT NULL,
-    unit text NOT NULL,
-    qty double precision NOT NULL,
-    rate double precision NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES account_app.project(id)
-);
 
 CREATE TABLE account_app.transaction (
     id uuid DEFAULT uuid_generate_v4(),
     company_id uuid NOT NULL,
-    voucher_id uuid DEFAULT uuid_generate_v4(),
-    voucher_type text NOT NULL,
     date date NOT NULL,
+    voucher_type text NOT NULL,
+    -- voucher_type = SALES (SA) | PURCHASE (PU) | RECIEPT (RV) | PAYMENTS (PV) | JOURNAL (JV)
+    voucher_no text NOT NULL,
     currency text NOT NULL,
-    salesman_id uuid NOT NULL,
-    -- voucher_type = SALES (SA) | PURCHASE (PU) | RECIEPT (RV) | PAYMENTS (PV) | JOURNAL (JV)    
-    account_id uuid NOT NULL,
-    narration text NOT NULL,
+    salesman_id uuid,
+    ref text,
+    invoice text,
+    narration text,
     amount double precision NOT NULL,
-    dc text NOT NULL,
-    -- dc = DEBIT (D) | CREDIT (C)
+    bank text,
+    cheque_no text,
+    cheque_date text,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (account_id) REFERENCES account_app.account(id),
-    FOREIGN KEY (voucher_id) REFERENCES account_app.journal_voucher(id),
-    FOREIGN KEY (voucher_id) REFERENCES account_app.sales_voucher(id),
-    FOREIGN KEY (voucher_id) REFERENCES account_app.purchase_voucher(id),
-    FOREIGN KEY (voucher_id) REFERENCES account_app.reciept_voucher(id),
-    FOREIGN KEY (salesman_id) REFERENCES account_app.salesman(id),
+    FOREIGN KEY (company_id) REFERENCES account_app.company(id),
+    FOREIGN KEY (salesman_id) REFERENCES account_app.salesman(id)
+);
+
+CREATE TABLE account_app.transaction_account (
+    id uuid DEFAULT uuid_generate_v4(),
+    transaction_id uuid NOT NULL,
+    company_id uuid NOT NULL,
+    project_id uuid NOT NULL,
+    account_id int NOT NULL,
+    date date NOT NULL,
+    narration text,
+    amount double precision NOT NULL,
+    dc char(1) NOT NULL,
+    -- DEBIT (D) | CREDIT (C)
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (transaction_id) REFERENCES account_app.transaction(id),
+    FOREIGN KEY (company_id) REFERENCES account_app.company(id),
+    FOREIGN KEY (project_id) REFERENCES account_app.project(id),
+    FOREIGN KEY (account_id) REFERENCES account_app.account(id)
+);
+
+CREATE TABLE account_app.transaction_item (
+    id uuid DEFAULT uuid_generate_v4(),
+    transaction_id uuid NOT NULL,
+    company_id uuid NOT NULL,
+    date date NOT NULL,
+    item_id uuid NOT NULL,
+    description text NOT NULL,
+    unit text NOT NULL,
+    qty double precision NOT NULL,
+    rate double precision NOT NULL,
+    amount double precision NOT NULL,
+    io char(1) NOT NULL,
+    -- IN (I) | OUT (O)
+    location_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (transaction_id) REFERENCES account_app.transaction(id),
+    FOREIGN KEY (company_id) REFERENCES account_app.company(id),
+    FOREIGN KEY (item_id) REFERENCES account_app.item(id),
+    FOREIGN KEY (location_id) REFERENCES account_app.location(id)
 );

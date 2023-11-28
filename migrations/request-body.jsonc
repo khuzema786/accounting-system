@@ -1,0 +1,180 @@
+// Purchase Voucher
+{
+    "voucherType": "PU",
+    "date": "26/11/2023", // transaction.date | tran_account.date | transaction_item.date
+    "projectId": "e5781ca9-775f-497f-8161-c626a9e5b7ea", // transaction_account.project_id
+    "voucherNo": "1",
+    "currency": "INR",
+    "invoice": "0011",
+    "ref": "001-Ref",
+    "narration": "Purchase Computer",
+    "amount": 3250.00,
+    "accounts": [ // transaction_account
+        {
+            "id": 511,  
+            "dc": "D",
+            "narration": "Purchase Account of all items",
+            "amount": 3100.00
+        },
+        {
+            "id": 142,
+            "dc": "D", // Assets to be recieved from tax govt
+            "narration": "Vat Account on Purchase Account of all items",
+            "amount": 150.00
+        },
+        {
+            "id": 461,
+            "dc": "C",
+            "narration": "Discount Account on items",
+            "amount": 100.00
+        },
+        {
+            "id": 231,
+            "dc": "C",
+            "narration": "Supplier Account",
+            "amount": 3150.00
+        }
+    ],
+    "items": [ // transaction_item
+        {
+            "id": "1e1661e2-1297-494f-8a95-d8574e7c3df0",
+            "locationId": "2b35475d-b887-45af-8459-46ca820ccbb8",
+            "description": "",
+            "unit": "Nos",
+            "qty": 1.00,
+            "rate": 3100.00,
+            "amount": 3100.00
+        }
+    ]
+}
+
+// Sales Voucher
+{
+    "voucherType": "SA",
+    "date": "26/11/2023", // transaction.date | tran_account.date | transaction_item.date
+    "salesmanId": "1",
+    "projectId": "e5781ca9-775f-497f-8161-c626a9e5b7ea", // transaction_account.project_id
+    "voucherNo": "1",
+    "currency": "INR",
+    "invoice": "0011",
+    "ref": "001-Ref",
+    "narration": "Sales Computer",
+    "amount": 4300.00,
+    "accounts": [ // transaction_account
+        {
+            "id": 171,
+            "dc": "D", // Debit the reciever
+            "narration": "Customer Account Recieving the Items",
+            "amount": 4200.00
+        },
+        {
+            "id": 521,
+            "dc": "D", // Debit the losses
+            "narration": "Discount Account on items",
+            "amount": 100.00
+        },
+        {
+            "id": 411,
+            "dc": "C", // Credit the giver
+            "narration": "Sales Account of all items",
+            "amount": 4100.00
+        }
+        {
+            "id": 222,
+            "dc": "C", // Liabilities to be paid to tax govt
+            "narration": "Vat Account on Sales Account of all items",
+            "amount": 200.00
+        },
+    ],
+    "items": [ // transaction_item
+        {
+            "id": "1e1661e2-1297-494f-8a95-d8574e7c3df0",
+            "locationId": "2b35475d-b887-45af-8459-46ca820ccbb8",
+            "description": "",
+            "unit": "Nos",
+            "qty": 1.00,
+            "rate": 4200.00,
+            "amount": 4200.00
+        }
+    ]
+}
+
+// Reciept Voucher - To be recieved from the party or customer later
+{
+    "voucherType": "RV",
+    "date": "26/11/2023", // transaction.date | tran_account.date | transaction_item.date
+    "projectId": "e5781ca9-775f-497f-8161-c626a9e5b7ea", // transaction_account.project_id
+    "voucherNo": "1",
+    "currency": "INR",
+    "invoice": "0011",
+    "ref": "001-Ref",
+    "narration": "Receipt from party customer",
+    "amount": 4200.00,
+    "accounts": [ // transaction_account
+        {
+            "id": 151,
+            "dc": "D", // Debit what comes in
+            "narration": "Cash Account - Recieved Cash From Party (Customer)",
+            "amount": 4200.00
+        },
+        {
+            "id": 171,
+            "dc": "C", // Credit the giver
+            "narration": "Customer Account - Recieved From Party (Customer)",
+            "amount": 4200.00
+        },
+    ]
+}
+
+// Payment Voucher - To be payed to the vendor or supplier later
+{
+    "voucherType": "PV",
+    "date": "26/11/2023", // transaction.date | tran_account.date | transaction_item.date
+    "projectId": "e5781ca9-775f-497f-8161-c626a9e5b7ea", // transaction_account.project_id
+    "voucherNo": "1",
+    "currency": "INR",
+    "invoice": "0011",
+    "ref": "001-Ref",
+    "narration": "Payment to Vendor Supplier",
+    "amount": 3150.00,
+    "accounts": [ // transaction_account
+        {
+            "id": 231,
+            "dc": "D", // Debit the reciever
+            "narration": "Supplier Account - Payment to Party (Supplier)",
+            "amount": 4200.00
+        },
+        {
+            "id": 151,
+            "dc": "C", // Credit what goes out
+            "narration": "Cash Account - Payment to Vendor (Supplier)",
+            "amount": 4200.00
+        },
+    ]
+}
+
+// Journal Voucher - Generic voucher used for internal accounts
+{
+    "voucherType": "JV",
+    "date": "26/11/2023", // transaction.date | tran_account.date | transaction_item.date
+    "projectId": "e5781ca9-775f-497f-8161-c626a9e5b7ea", // transaction_account.project_id
+    "voucherNo": "1",
+    "currency": "INR",
+    "ref": "001-Ref",
+    "narration": "Tajik Paid to Ebrahim",
+    "amount": 5000.00,
+    "accounts": [ // transaction_account
+        {
+            "id": 181,
+            "dc": "D", // Debit the reciever
+            "narration": "Ebrahim Account - Recieving Cash",
+            "amount": 5000.00
+        },
+        {
+            "id": 182,
+            "dc": "C", // Credit the giver
+            "narration": "Tajik Account - Paying Cash",
+            "amount": 5000.00
+        },
+    ]
+}
