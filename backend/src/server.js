@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 const { v4: uuid } = require("uuid");
 const app = express();
 
@@ -19,9 +20,54 @@ const pool = new Pool({
   password: process.env["DB_PASSWORD"],
   port: process.env["DB_PORT"],
 });
-const companyId = "464c48c1-463c-425d-bdfa-85435524fcdc";
 
-app.get("/currency/list", async (_, response) => {
+const verifyAuth = (req, res, next) => {
+  const token = req.headers["token"];
+  if (token) {
+    jwt.verify(token, process.env["AUTH_SECRET"], (err, person) => {
+      if (err) {
+        res.sendStatus(403);
+      } else {
+        req.authData = { ...person, token };
+      }
+    });
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+};
+
+app.post("/login", async (request, response) => {
+  const { email, password } = request.body;
+
+  const { rows: persons } = await pool.query(
+    `SELECT * FROM ${dbSchema}.person WHERE email = $1 AND password = $2 LIMIT 1`,
+    [email, password]
+  );
+  const person = persons[0];
+
+  jwt.sign(
+    { personId: person.id, companyId: person.company_id },
+    process.env["AUTH_SECRET"],
+    (err, token) => {
+      response.status(200).json({
+        token,
+        id: person.id,
+        companyId: person.company_id,
+      });
+    }
+  );
+});
+
+app.post("/logout", verifyAuth, async (request, response) => {
+  const { token } = request.authData;
+  jwt.destroy(token);
+  response.status(200).json({ status: "SUCCESS" });
+});
+
+app.get("/currency/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: currencies } = await pool.query(
     `SELECT * FROM ${dbSchema}.currency WHERE company_id = $1`,
     [companyId]
@@ -36,7 +82,9 @@ app.get("/currency/list", async (_, response) => {
   );
 });
 
-app.get("/unit/list", async (_, response) => {
+app.get("/unit/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: units } = await pool.query(
     `SELECT * FROM ${dbSchema}.unit WHERE company_id = $1`,
     [companyId]
@@ -51,7 +99,9 @@ app.get("/unit/list", async (_, response) => {
   );
 });
 
-app.get("/location/list", async (_, response) => {
+app.get("/location/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: locations } = await pool.query(
     `SELECT * FROM ${dbSchema}.location WHERE company_id = $1`,
     [companyId]
@@ -66,7 +116,9 @@ app.get("/location/list", async (_, response) => {
   );
 });
 
-app.get("/project/list", async (_, response) => {
+app.get("/project/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: projects } = await pool.query(
     `SELECT * FROM ${dbSchema}.project WHERE company_id = $1`,
     [companyId]
@@ -82,7 +134,9 @@ app.get("/project/list", async (_, response) => {
   );
 });
 
-app.get("/salesman/list", async (_, response) => {
+app.get("/salesman/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: salesmans } = await pool.query(
     `SELECT * FROM ${dbSchema}.salesman WHERE company_id = $1`,
     [companyId]
@@ -97,7 +151,9 @@ app.get("/salesman/list", async (_, response) => {
   );
 });
 
-app.get("/item/list", async (_, response) => {
+app.get("/item/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: items } = await pool.query(
     `SELECT * FROM ${dbSchema}.item WHERE company_id = $1`,
     [companyId]
@@ -115,7 +171,7 @@ app.get("/item/list", async (_, response) => {
   );
 });
 
-const constructAccountTree = async (account) => {
+const constructAccountTree = async (account, companyId) => {
   let output = {};
 
   if (!account.children_id) {
@@ -124,8 +180,6 @@ const constructAccountTree = async (account) => {
     };
     return output;
   }
-
-  console.log(company_id, account.children_id);
 
   const { rows: accounts } = await pool.query(
     `SELECT * FROM ${dbSchema}.account WHERE company_id = $1 AND id = ANY($2::int[])`,
@@ -137,14 +191,16 @@ const constructAccountTree = async (account) => {
       id: account.id,
       children: {
         ...(output[account.name]?.children || {}),
-        ...(await constructAccountTree(accounts[i])),
+        ...(await constructAccountTree(accounts[i], companyId)),
       },
     };
   }
   return output;
 };
 
-app.get("/account/list", async (_, response) => {
+app.get("/account/list", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const { rows: accounts } = await pool.query(
     `SELECT * FROM ${dbSchema}.account WHERE company_id = $1 AND parent_id IS NULL ORDER BY id ASC`,
     [companyId]
@@ -152,13 +208,18 @@ app.get("/account/list", async (_, response) => {
 
   let output = {};
   for (let i = 0; i < accounts.length; i++) {
-    output = { ...output, ...(await constructAccountTree(accounts[i])) };
+    output = {
+      ...output,
+      ...(await constructAccountTree(accounts[i], companyId)),
+    };
   }
 
   response.status(200).json(output);
 });
 
-app.post("/invoice/create", async (request, response) => {
+app.post("/invoice/create", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
   const {
     voucherType,
     date,

@@ -1,24 +1,24 @@
 CREATE TABLE account_app.person (
     id uuid DEFAULT uuid_generate_v4(),
+    company_id uuid NOT NULL,
     name text NOT NULL,
     email text NOT NULL,
     password text NOT NULL,
-    mobile_number text NOT NULL,
-    companies text [] NOT NULL,
+    mobile_number text,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT person_id_pkey PRIMARY KEY (id)
 );
 
 INSERT INTO
-    account_app.person (name, email, password, mobile_number, companies)
+    account_app.person (company_id, name, email, password, mobile_number)
 VALUES
     (
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
         'admin',
         'admin@gmail.com',
         'admin',
-        '+91-123456789',
-        '{464c48c1-463c-425d-bdfa-85435524fcdc}'
+        '+91-123456789'        
     );
 
 CREATE TABLE account_app.company (
