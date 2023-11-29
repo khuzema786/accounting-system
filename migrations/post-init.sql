@@ -591,7 +591,7 @@ CREATE TABLE account_app.transaction (
     voucher_type text NOT NULL,
     -- voucher_type = SALES (SA) | PURCHASE (PU) | RECIEPT (RV) | PAYMENTS (PV) | JOURNAL (JV)
     voucher_no text NOT NULL,
-    currency text NOT NULL,
+    currency_id uuid NOT NULL,
     salesman_id uuid,
     ref text,
     invoice text,
