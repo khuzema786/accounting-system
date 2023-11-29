@@ -9,6 +9,7 @@ CREATE TABLE account_app.person (
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT person_id_pkey PRIMARY KEY (id)
 );
+CREATE INDEX idx_person_email_password ON account_app.person USING btree (email, password);
 
 INSERT INTO
     account_app.person (company_id, name, email, password, mobile_number)
@@ -393,7 +394,7 @@ VALUES
         2,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
-        '{22}',
+        '{22, 23}',
         'Liabilities'
     );
 
@@ -468,7 +469,7 @@ VALUES
         4,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
-        '{41}',
+        '{41, 46}',
         'Income'
     );
 

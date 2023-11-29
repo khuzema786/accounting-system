@@ -7,13 +7,34 @@
 	},
 	"item": [
 		{
-			"name": "Add User",
+			"name": "Authentication",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const resp = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", resp.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\" : \"khuzema\",\n    \"email\" : \"khuzema@gmail.com\"\n}",
+					"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"admin\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -21,41 +42,130 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3001/users",
-					"protocol": "http",
+					"raw": "{{host}}/login",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{host}}"
 					],
-					"port": "3001",
 					"path": [
-						"users"
+						"login"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get All Users",
+			"name": "Get All Projects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const projects = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"projectId\", projects.find(({ name }) => name === \"Office\").id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\" : \"khuzema\",\n    \"email\" : \"khuzema@gmail.com\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
-							"language": "json"
+							"language": "text"
 						}
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3001/users",
+					"raw": "{{host}}/project/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"project",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Locations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const locations = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"locationId\", locations.find(({ name }) => name === \"Main\").id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3001/location/list",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -65,11 +175,575 @@
 					],
 					"port": "3001",
 					"path": [
-						"users"
+						"location",
+						"list"
 					]
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get All Items",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const items = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"itemId\", items.find(({ name }) => name === \"Buffalo\").id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3001/item/list",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3001",
+					"path": [
+						"item",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Units",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const units = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"unitId\", units.find(({ shortName }) => shortName === \"Nos\").id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3001/unit/list",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3001",
+					"path": [
+						"unit",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Currencies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const currencies = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"currencyId\", currencies.find(({ shortName }) => shortName === \"AED\").id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3001/currency/list",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3001",
+					"path": [
+						"currency",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Accounts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"postman.setEnvironmentVariable(\"accounts\", responseBody);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:3001/account/list",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3001",
+					"path": [
+						"account",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Purchase Voucher (For Buying Item from Supplier)",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"voucherType\": \"PU\",\n    \"date\": \"2023-11-01\",\n    \"projectId\": \"e5781ca9-775f-497f-8161-c626a9e5b7ea\",\n    \"voucherNo\": \"VOUCHER-001\",\n    \"currencyId\": \"5290d22a-9f99-4449-98dc-a886e46e4269\",\n    \"invoice\": \"INVOICE-001\",\n    \"ref\": \"REF-001\",\n    \"narration\": \"Purchase Computer\",\n    \"amount\": 3250.00,\n    \"accounts\": [\n        {\n            \"id\": 511,  // Expenses.Purchase.Purchase - Debit The Reciever Account\n            \"dc\": \"D\",\n            \"narration\": \"Purchase Account of all items\",\n            \"amount\": 3100.00\n        },\n        {\n            \"id\": 142, // Assets.CurrentAsset.Vat - Debit The Income\n            \"dc\": \"D\",\n            \"narration\": \"Vat Account on Purchase Account of all items\",\n            \"amount\": 150.00\n        },\n        {\n            \"id\": 411, // Income.Sales.Sales - Credit The Losses\n            \"dc\": \"C\",\n            \"narration\": \"Discount Account on items\",\n            \"amount\": 100.00\n        },\n        {\n            \"id\": 231, // \n            \"dc\": \"C\",\n            \"narration\": \"Supplier Account\",\n            \"amount\": 3150.00\n        }\n    ],\n    \"items\": [\n        {\n            \"id\": \"1e1661e2-1297-494f-8a95-d8574e7c3df0\",\n            \"locationId\": \"2b35475d-b887-45af-8459-46ca820ccbb8\",\n            \"description\": \"1 Buffalo Drink Puchase, Moved In\",\n            \"unit\": \"Nos\",\n            \"qty\": 1.00,\n            \"rate\": 3100.00,\n            \"amount\": 3100.00,\n            \"io\": \"I\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoice/create",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoice",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Payment Voucher (For Postpaid Purchase Voucher)",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"voucherType\": \"PV\",\n    \"date\": \"2023-11-01\",\n    \"projectId\": \"e5781ca9-775f-497f-8161-c626a9e5b7ea\",\n    \"voucherNo\": \"VOUCHER-001\",\n    \"currencyId\": \"5290d22a-9f99-4449-98dc-a886e46e4269\",\n    \"invoice\": \"INVOICE-001\",\n    \"ref\": \"REF-001\",\n    \"narration\": \"Payment to Vendor Supplier\",\n    \"amount\": 3150.00,\n    \"accounts\": [\n        {\n            \"id\": 231,\n            \"dc\": \"D\", // Debit the reciever\n            \"narration\": \"Supplier Account - Payment to Party (Supplier)\",\n            \"amount\": 4200.00\n        },\n        {\n            \"id\": 151,\n            \"dc\": \"C\", // Credit what goes out\n            \"narration\": \"Cash Account - Payment to Vendor (Supplier)\",\n            \"amount\": 4200.00\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoice/create",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoice",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Sales Voucher (For Selling Item to Vendor)",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"voucherType\": \"SA\",\n    \"date\": \"2023-11-15\",\n    \"projectId\": \"e5781ca9-775f-497f-8161-c626a9e5b7ea\",\n    \"voucherNo\": \"VOUCHER-002\",\n    \"currencyId\": \"5290d22a-9f99-4449-98dc-a886e46e4269\",\n    \"invoice\": \"INVOICE-002\",\n    \"ref\": \"REF-002\",\n    \"narration\": \"Sales Computer\",\n    \"amount\": 4300.00,\n    \"accounts\": [\n        {\n            \"id\": 171,\n            \"dc\": \"D\", // Debit the reciever\n            \"narration\": \"Customer Account Recieving the Items\",\n            \"amount\": 4200.00\n        },\n        {\n            \"id\": 521,\n            \"dc\": \"D\", // Debit the losses\n            \"narration\": \"Discount Account on items\",\n            \"amount\": 100.00\n        },\n        {\n            \"id\": 411,\n            \"dc\": \"C\", // Credit the giver\n            \"narration\": \"Sales Account of all items\",\n            \"amount\": 4100.00\n        },\n        {\n            \"id\": 222,\n            \"dc\": \"C\", // Liabilities to be paid to tax govt\n            \"narration\": \"Vat Account on Sales Account of all items\",\n            \"amount\": 200.00\n        }\n    ],\n    \"items\": [\n        {\n            \"id\": \"1e1661e2-1297-494f-8a95-d8574e7c3df0\",\n            \"locationId\": \"2b35475d-b887-45af-8459-46ca820ccbb8\",\n            \"description\": \"1 Buffalo Drink Puchase, Moved Out\",\n            \"unit\": \"Nos\",\n            \"qty\": 1.00,\n            \"rate\": 4200.00,\n            \"amount\": 4200.00,\n            \"io\": \"O\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoice/create",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoice",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Reciept Voucher (For Postpaid Sales Voucher)",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"voucherType\": \"RV\",\n    \"date\": \"2023-11-15\",\n    \"projectId\": \"e5781ca9-775f-497f-8161-c626a9e5b7ea\",\n    \"voucherNo\": \"VOUCHER-002\",\n    \"currencyId\": \"5290d22a-9f99-4449-98dc-a886e46e4269\",\n    \"invoice\": \"INVOICE-002\",\n    \"ref\": \"REF-002\",\n    \"narration\": \"Receipt from party customer\",\n    \"amount\": 4200.00,\n    \"accounts\": [\n       {\n            \"id\": 151,\n            \"dc\": \"D\", // Debit what comes in\n            \"narration\": \"Cash Account - Recieved Cash From Party (Customer)\",\n            \"amount\": 4200.00\n        },\n        {\n            \"id\": 171,\n            \"dc\": \"C\", // Credit the giver\n            \"narration\": \"Customer Account - Recieved From Party (Customer)\",\n            \"amount\": 4200.00\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoice/create",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoice",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Journal Voucher (For Internal Accouting Transactions)",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"voucherType\": \"JV\",\n    \"date\": \"2023-11-15\",\n    \"projectId\": \"e5781ca9-775f-497f-8161-c626a9e5b7ea\",\n    \"voucherNo\": \"VOUCHER-003\",\n    \"currencyId\": \"5290d22a-9f99-4449-98dc-a886e46e4269\",\n    \"invoice\": \"INVOICE-003\",\n    \"ref\": \"REF-003\",\n    \"narration\": \"Receipt from party customer\",\n    \"amount\": 4200.00,\n    \"accounts\": [\n       {\n            \"id\": 181,\n            \"dc\": \"D\", // Debit the reciever\n            \"narration\": \"Ebrahim Account - Recieving Cash\",\n            \"amount\": 5000.00\n        },\n        {\n            \"id\": 182,\n            \"dc\": \"C\", // Credit the giver\n            \"narration\": \"Tajik Account - Paying Cash\",\n            \"amount\": 5000.00\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/invoice/create",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"invoice",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{token}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "token",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/logout",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://127.0.0.1:3001",
+			"type": "string"
 		}
 	]
 }

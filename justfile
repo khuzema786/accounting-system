@@ -1,7 +1,10 @@
 default:
 	@just --list
-fresh-start:
+clean-all:
+	docker-compose down -v --rmi
+clean-volume:
 	docker-compose down -v
-	docker-compose up
+clean-image:
+	docker-compose down -v
 start:
 	docker-compose up
