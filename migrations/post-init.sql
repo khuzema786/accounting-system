@@ -267,6 +267,7 @@ CREATE TABLE account_app.item (
     detail text NOT NULL,
     last_purchase_price double precision NOT NULL,
     last_selling_price double precision NOT NULL,
+    balance int NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
@@ -305,7 +306,7 @@ VALUES
         1,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
-        '{14, 15, 17, 18}',
+        '{14, 12, 13, 14, 15, 16, 17, 18}',
         'Assets'
     );
 
@@ -313,12 +314,136 @@ INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
+        11,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{111, 112, 113, 114, 115}',
+        'Fixed Assets'
+    ),
+    (
+        12,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{121, 122, 123}',
+        'Investments'
+    ),
+    (
+        13,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        NULL,
+        'Closing Stock'
+    ),
+    (
         14,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
         '{141, 142}',
         'Current Asset'
     ),
+    (
+        15,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{151, 152, 153}',
+        'Cash & Bank'
+    ),
+    (
+        16,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{161}',
+        'Deposits'
+    ),
+    (
+        17,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{171, 172}',
+        'Customers'
+    ),
+    (
+        17,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{171, 172}',
+        'Customers'
+    ),
+    (
+        18,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        '{181, 182}',
+        'Loans & Advances Receivables'
+    ),
+    (
+        19,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        1,
+        NULL,
+        'Prepaids'
+    )
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        111,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        11,
+        NULL,
+        'Furnitures'
+    ),
+    (
+        112,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        11,
+        NULL,
+        'Equipments'
+    ),
+    (
+        113,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        11,
+        NULL,
+        'Computers'
+    ),
+    (
+        114,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        11,
+        NULL,
+        'Vehicles'
+    ),
+    (
+        115,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        11,
+        NULL,
+        'Depreciation'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        121,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        12,
+        NULL,
+        'Fixed Assets'
+    ),
+    (
+        122,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        12,
+        NULL,
+        'Fixed Assets'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
     (
         141,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
@@ -331,13 +456,6 @@ VALUES
 INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
-    (
-        15,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        1,
-        '{151, 152, 153}',
-        'Cash & Bank'
-    ),
     (
         151,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
@@ -352,13 +470,6 @@ INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
-        17,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        1,
-        '{171, 172}',
-        'Customer'
-    ),
-    (
         171,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         17,
@@ -370,13 +481,6 @@ VALUES
 INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
-    (
-        18,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        1,
-        '{181, 182}',
-        'Customer'
-    ),
     (
         181,
         '464c48c1-463c-425d-bdfa-85435524fcdc',

@@ -217,6 +217,25 @@ app.get("/account/list", verifyAuth, async (request, response) => {
   response.status(200).json(output);
 });
 
+app.get("/account/create", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+
+  const { rows: accounts } = await pool.query(
+    `SELECT * FROM ${dbSchema}.account WHERE company_id = $1 AND parent_id IS NULL ORDER BY id ASC`,
+    [companyId]
+  );
+
+  let output = {};
+  for (let i = 0; i < accounts.length; i++) {
+    output = {
+      ...output,
+      ...(await constructAccountTree(accounts[i], companyId)),
+    };
+  }
+
+  response.status(200).json(output);
+});
+
 app.post("/invoice/create", verifyAuth, async (request, response) => {
   const { companyId } = request.authData;
 
