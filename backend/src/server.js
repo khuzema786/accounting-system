@@ -159,16 +159,31 @@ app.get("/item/list", verifyAuth, async (request, response) => {
     [companyId]
   );
 
-  response.status(200).json(
-    items.map((item) => ({
+  const itemsWithLocations = [];
+  for (const item of items) {
+    let { rows: locations } = await pool.query(
+      `SELECT * FROM ${dbSchema}.location WHERE id = $1 AND company_id = $2`,
+      [item.location_id, companyId]
+    );
+    const location = locations[0];
+
+    itemsWithLocations.push({
       id: item.id,
+      location: {
+        id: location.id,
+        name: location.name,
+        detail: location.detail,
+      },
       name: item.name,
       type: item.type,
-      detail: item.type,
+      detail: item.detail,
+      stock: item.stock,
       lastPurchasePrice: item.last_purchase_price,
       lastSellingPrice: item.last_selling_price,
-    }))
-  );
+    });
+  }
+
+  response.status(200).json(itemsWithLocations);
 });
 
 const constructAccountTree = async (account, companyId) => {
@@ -199,25 +214,6 @@ const constructAccountTree = async (account, companyId) => {
 };
 
 app.get("/account/list", verifyAuth, async (request, response) => {
-  const { companyId } = request.authData;
-
-  const { rows: accounts } = await pool.query(
-    `SELECT * FROM ${dbSchema}.account WHERE company_id = $1 AND parent_id IS NULL ORDER BY id ASC`,
-    [companyId]
-  );
-
-  let output = {};
-  for (let i = 0; i < accounts.length; i++) {
-    output = {
-      ...output,
-      ...(await constructAccountTree(accounts[i], companyId)),
-    };
-  }
-
-  response.status(200).json(output);
-});
-
-app.get("/account/create", verifyAuth, async (request, response) => {
   const { companyId } = request.authData;
 
   const { rows: accounts } = await pool.query(
@@ -280,8 +276,30 @@ app.post("/invoice/create", verifyAuth, async (request, response) => {
   );
 
   accounts.forEach(async ({ id: accountId, dc, narration, amount }) => {
+    const balance = await (async () => {
+      const { rows: accounts } = await pool.query(
+        `SELECT * FROM ${dbSchema}.account WHERE id = $2 and company_id = $3`,
+        [accountId, companyId]
+      );
+      const balance = accounts[0].balance;
+      if (dc === "D") {
+        await pool.query(
+          `UPDATE ${dbSchema}.account SET balance = balance + $1 WHERE id = $2 and company_id = $3`,
+          [amount, accountId, companyId]
+        );
+        return balance + amount;
+      } else if (dc === "C") {
+        await pool.query(
+          `UPDATE ${dbSchema}.account SET balance = balance - $1 WHERE id = $2 and company_id = $3`,
+          [amount, accountId, companyId]
+        );
+        return balance - amount;
+      } else {
+        throw Error("DC value not supported.");
+      }
+    })();
     await pool.query(
-      `INSERT INTO ${dbSchema}.transaction_account (transaction_id, company_id, project_id, account_id, date, narration, amount, dc) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `INSERT INTO ${dbSchema}.transaction_account (transaction_id, company_id, project_id, account_id, date, narration, amount, dc, balance) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         transactionId,
         companyId,
@@ -291,23 +309,32 @@ app.post("/invoice/create", verifyAuth, async (request, response) => {
         narration,
         amount,
         dc,
+        balance,
       ]
     );
   });
 
   items.forEach(
-    async ({
-      id: itemId,
-      locationId,
-      description,
-      unit,
-      qty,
-      rate,
-      amount,
-      io,
-    }) => {
+    async ({ id: itemId, description, unit, qty, rate, amount }) => {
+      const movement = await (async () => {
+        if (voucherType === "PU") {
+          await pool.query(
+            `UPDATE ${dbSchema}.item SET stock = stock + $1, last_purchase_price = $2 WHERE id = $3 and company_id = $4`,
+            [qty, amount, itemId, companyId]
+          );
+          return "IN";
+        } else if (voucherType === "SA") {
+          await pool.query(
+            `UPDATE ${dbSchema}.item SET stock = stock - $1, last_selling_price = $2 WHERE id = $3 and company_id = $4`,
+            [qty, amount, itemId, companyId]
+          );
+          return "OUT";
+        } else {
+          throw Error("Unrelated voucher type.");
+        }
+      })();
       await pool.query(
-        `INSERT INTO ${dbSchema}.transaction_item (transaction_id, company_id, date, item_id, description, unit, qty, rate, amount, io, location_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        `INSERT INTO ${dbSchema}.transaction_item (transaction_id, company_id, date, item_id, description, unit, qty, rate, amount, movement) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           transactionId,
           companyId,
@@ -318,14 +345,26 @@ app.post("/invoice/create", verifyAuth, async (request, response) => {
           qty,
           rate,
           amount,
-          io,
-          locationId,
+          movement,
         ]
       );
     }
   );
 
-  response.json({ status: "SUCCESS" });
+  response.json({ transactionId: transactionId });
+});
+
+app.get("/account/:accountId/ledger", verifyAuth, async (request, response) => {
+  const { companyId } = request.authData;
+  const { accountId } = request.params;
+  const { projectId, startDateInUtc, endDateInUtc } = request.body;
+
+  const { rows: transactionAccounts } = await pool.query(
+    `SELECT * FROM ${dbSchema}.transaction_account AS T1 INNER JOIN ${dbSchema}.transaction AS T2 ON T1.transaction_id = T2.id WHERE company_id = $1 AND account_id = $2 AND project_id = $3 AND date >= $4 AND date < $5 ORDER BY date DESC`,
+    [companyId, accountId, projectId, startDateInUtc, endDateInUtc]
+  );
+
+  response.json({ transactionAccounts });
 });
 
 app.listen(process.env["APP_PORT"], () => {

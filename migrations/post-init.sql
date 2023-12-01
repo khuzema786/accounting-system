@@ -262,12 +262,13 @@ VALUES
 CREATE TABLE account_app.item (
     id uuid DEFAULT uuid_generate_v4(),
     company_id uuid NOT NULL,
+    location_id uuid NOT NULL,
     name text NOT NULL,
     type text,
     detail text NOT NULL,
     last_purchase_price double precision NOT NULL,
     last_selling_price double precision NOT NULL,
-    balance int NOT NULL,
+    stock int NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
@@ -275,16 +276,18 @@ CREATE TABLE account_app.item (
 );
 
 INSERT INTO
-    account_app.item (id, company_id, name, type, detail, last_purchase_price, last_selling_price)
+    account_app.item (id, company_id, location_id, name, type, detail, last_purchase_price, last_selling_price, stock)
 VALUES
     (
         '1e1661e2-1297-494f-8a95-d8574e7c3df0',
         '464c48c1-463c-425d-bdfa-85435524fcdc',
+        '2b35475d-b887-45af-8459-46ca820ccbb8',
         'Buffalo',
         'Food',
         '250ml energy drink',
         3100.00,
-        3100.00
+        3100.00,
+        100
     );
 
 CREATE TABLE account_app.account (
@@ -293,6 +296,7 @@ CREATE TABLE account_app.account (
     parent_id int,
     children_id int [],
     name text NOT NULL,
+    balance double precision NOT NULL DEFAULT 0.00,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id)
@@ -363,13 +367,6 @@ VALUES
         'Customers'
     ),
     (
-        17,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        1,
-        '{171, 172}',
-        'Customers'
-    ),
-    (
         18,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         1,
@@ -382,7 +379,7 @@ VALUES
         1,
         NULL,
         'Prepaids'
-    )
+    );
 
 INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
@@ -420,7 +417,7 @@ VALUES
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         11,
         NULL,
-        'Depreciation'
+        'Less: Depreciation'
     );
 
 INSERT INTO
@@ -431,14 +428,32 @@ VALUES
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         12,
         NULL,
-        'Fixed Assets'
+        'Fixed Deposits'
     ),
     (
         122,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         12,
         NULL,
-        'Fixed Assets'
+        'Shares'
+    ),
+    (
+        123,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        12,
+        NULL,
+        'Mutual Funds'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        131,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        13,
+        NULL,
+        'Closing Stock'
     );
 
 INSERT INTO
@@ -449,7 +464,7 @@ VALUES
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         14,
         NULL,
-        'PDC Recievables'
+        'PDC Receivables'
     ),
     (142, '464c48c1-463c-425d-bdfa-85435524fcdc', 14, NULL, 'VAT (Input Purchases)');
 
@@ -463,8 +478,19 @@ VALUES
         NULL,
         'Cash'
     ),
-    (152, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'Axis'),
-    (153, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'HDFC');
+    (152, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'HDFC'),
+    (153, '464c48c1-463c-425d-bdfa-85435524fcdc', 15, NULL, 'AXIS');
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        161,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        16,
+        NULL,
+        'DEWA'
+    );
 
 INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
@@ -506,12 +532,69 @@ INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
     (
+        21,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        2,
+        '{211, 212}',
+        'Capital'
+    ),
+    (
         22,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         2,
         '{221, 222, 223}',
         'Current Liabilities'
     ),
+    (
+        23,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        2,
+        '{231, 232}',
+        'Vendor'
+    ),
+    (
+        24,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        2,
+        NULL,
+        'Vendor'
+    ),
+    (
+        25,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        2,
+        NULL,
+        'Loan & Advances Payables'
+    ),
+    (
+        26,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        2,
+        NULL,
+        'Accured Expenses'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        211,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        21,
+        NULL,
+        'Partners Capital'
+    ),
+    (
+        212,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        21,
+        NULL,
+        'Add: Profit/Loss'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES    
     (
         221,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
@@ -522,17 +605,9 @@ VALUES
     (222, '464c48c1-463c-425d-bdfa-85435524fcdc', 22, NULL, 'VAT (Output Sales)'),
     (223, '464c48c1-463c-425d-bdfa-85435524fcdc', 22, NULL, 'FTA (VAT)');
 
--- Vendor
 INSERT INTO
     account_app.account (id, company_id, parent_id, children_id, name)
 VALUES
-    (
-        23,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        2,
-        '{231, 232}',
-        'Vendor'
-    ),
     (
         231,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
@@ -561,8 +636,19 @@ VALUES
         31,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         3,
-        NULL,
+        '{131}',
         'Stock in Hand'
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (
+        131,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        31,
+        NULL,
+        'Stock'
     );
 
 -- Income
@@ -573,7 +659,7 @@ VALUES
         4,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
-        '{41, 46}',
+        '{41, 42, 43, 44, 45, 46}',
         'Income'
     );
 
@@ -584,22 +670,55 @@ VALUES
         41,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         4,
-        '{411}',
+        '{411, 412}',
         'Sales'
     ),
-    (411, '464c48c1-463c-425d-bdfa-85435524fcdc', 41, NULL, 'Sales');
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
+    (
+        42,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        4,
+        NULL,
+        'Closing Stock'
+    ),
+    (
+        43,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        4,
+        NULL,
+        'Rents'
+    ),
+    (
+        44,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        4,
+        NULL,
+        'Interest/Dividends'
+    ),
+    (
+        45,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        4,
+        NULL,
+        'Commisions'
+    ),
     (
         46,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         4,
         '{461}',
         'Other Incomes'
-    ),
-    (461, '464c48c1-463c-425d-bdfa-85435524fcdc', 46, NULL, 'Discounts');
+    );
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (411, '464c48c1-463c-425d-bdfa-85435524fcdc', 41, NULL, 'Sales'),
+    (412, '464c48c1-463c-425d-bdfa-85435524fcdc', 41, NULL, 'Less: Sales Return');
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (461, '464c48c1-463c-425d-bdfa-85435524fcdc', 46, NULL, 'Discount on Purchases');
 
 -- Expenses
 INSERT INTO
@@ -609,7 +728,7 @@ VALUES
         5,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         NULL,
-        '{51, 52}',
+        '{51, 52, 53, 54, 55, 56, 57, 58, 59}',
         'Expenses'
     );
 
@@ -620,74 +739,84 @@ VALUES
         51,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
-        '{511}',
+        '{511, 512}',
         'Purchase'
     ),
-    (511, '464c48c1-463c-425d-bdfa-85435524fcdc', 51, NULL, 'Purchase');
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
     (
         52,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
-        '{521, 522, 523, 524}',
+        '{521}',
         'Cost of Sales'
     ),
-    (521, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Discounts'),
-    (522, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Customs'),
-    (523, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Freight'),
-    (524, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, ' Transport');
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
     (
         53,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
         'Direct Expense'
-    );
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
+    ),
     (
         54,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
-        '{541, 542, 543, 544}',
-        'Administration'
+        NULL,
+        'Custom'
     ),
-    (541, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Salary'),
-    (542, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Interest'),
-    (543, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Visa'),
-    (544, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, ' Advertisement');
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
     (
         55,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
-        'VAT'
-    );
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
+        'Freight'
+    ),
     (
         56,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        5,
+        NULL,
+        'Indirect Expense'
+    ),
+    (
+        57,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        5,
+        '{571, 572, 573, 574}',
+        'Administration'
+    ),
+    (
+        58,
+        '464c48c1-463c-425d-bdfa-85435524fcdc',
+        5,
+        NULL,
+        'VAT'
+    ),
+    (
+        59,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         5,
         NULL,
         'Bad Debts'
     );
 
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (511, '464c48c1-463c-425d-bdfa-85435524fcdc', 51, NULL, 'Purchases'),
+    (512, '464c48c1-463c-425d-bdfa-85435524fcdc', 51, NULL, 'Less: Purchase Return');
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (521, '464c48c1-463c-425d-bdfa-85435524fcdc', 52, NULL, 'Discount on Sales');
+
+INSERT INTO
+    account_app.account (id, company_id, parent_id, children_id, name)
+VALUES
+    (571, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Salary'),
+    (572, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Interest'),
+    (573, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, 'Visa'),
+    (574, '464c48c1-463c-425d-bdfa-85435524fcdc', 54, NULL, ' Advertisement');
 
 CREATE TABLE account_app.transaction (
     id uuid DEFAULT uuid_generate_v4(),
@@ -723,6 +852,7 @@ CREATE TABLE account_app.transaction_account (
     amount double precision NOT NULL,
     dc char(1) NOT NULL,
     -- DEBIT (D) | CREDIT (C)
+    balance double precision NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
@@ -743,9 +873,8 @@ CREATE TABLE account_app.transaction_item (
     qty double precision NOT NULL,
     rate double precision NOT NULL,
     amount double precision NOT NULL,
-    io char(1) NOT NULL,
-    -- IN (I) | OUT (O)
-    location_id uuid NOT NULL,
+    movement text NOT NULL,
+    -- IN | OUT
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
