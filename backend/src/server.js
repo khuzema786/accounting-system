@@ -314,42 +314,44 @@ app.post("/invoice/create", verifyAuth, async (request, response) => {
     );
   });
 
-  items.forEach(
-    async ({ id: itemId, description, unit, qty, rate, amount }) => {
-      const movement = await (async () => {
-        if (voucherType === "PU") {
-          await pool.query(
-            `UPDATE ${dbSchema}.item SET stock = stock + $1, last_purchase_price = $2 WHERE id = $3 and company_id = $4`,
-            [qty, amount, itemId, companyId]
-          );
-          return "IN";
-        } else if (voucherType === "SA") {
-          await pool.query(
-            `UPDATE ${dbSchema}.item SET stock = stock - $1, last_selling_price = $2 WHERE id = $3 and company_id = $4`,
-            [qty, amount, itemId, companyId]
-          );
-          return "OUT";
-        } else {
-          throw Error("Unrelated voucher type.");
-        }
-      })();
-      await pool.query(
-        `INSERT INTO ${dbSchema}.transaction_item (transaction_id, company_id, date, item_id, description, unit, qty, rate, amount, movement) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-        [
-          transactionId,
-          companyId,
-          date,
-          itemId,
-          description,
-          unit,
-          qty,
-          rate,
-          amount,
-          movement,
-        ]
-      );
-    }
-  );
+  if (items) {
+    items.forEach(
+      async ({ id: itemId, description, unit, qty, rate, amount }) => {
+        const movement = await (async () => {
+          if (voucherType === "PU") {
+            await pool.query(
+              `UPDATE ${dbSchema}.item SET stock = stock + $1, last_purchase_price = $2 WHERE id = $3 and company_id = $4`,
+              [qty, amount, itemId, companyId]
+            );
+            return "IN";
+          } else if (voucherType === "SA") {
+            await pool.query(
+              `UPDATE ${dbSchema}.item SET stock = stock - $1, last_selling_price = $2 WHERE id = $3 and company_id = $4`,
+              [qty, amount, itemId, companyId]
+            );
+            return "OUT";
+          } else {
+            throw Error("Unrelated voucher type.");
+          }
+        })();
+        await pool.query(
+          `INSERT INTO ${dbSchema}.transaction_item (transaction_id, company_id, date, item_id, description, unit, qty, rate, amount, movement) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            transactionId,
+            companyId,
+            date,
+            itemId,
+            description,
+            unit,
+            qty,
+            rate,
+            amount,
+            movement,
+          ]
+        );
+      }
+    );
+  }
 
   response.json({ transactionId: transactionId });
 });
@@ -359,10 +361,43 @@ app.get("/account/:accountId/ledger", verifyAuth, async (request, response) => {
   const { accountId } = request.params;
   const { projectId, startDateInUtc, endDateInUtc } = request.body;
 
-  const { rows: transactionAccounts } = await pool.query(
-    `SELECT * FROM ${dbSchema}.transaction_account AS T1 INNER JOIN ${dbSchema}.transaction AS T2 ON T1.transaction_id = T2.id WHERE company_id = $1 AND account_id = $2 AND project_id = $3 AND date >= $4 AND date < $5 ORDER BY date DESC`,
+  let { rows: transactionAccounts } = await pool.query(
+    `SELECT * FROM ${dbSchema}.transaction_account AS T1 
+    INNER JOIN ${dbSchema}.transaction AS T2 
+    ON T1.transaction_id = T2.id
+    WHERE T2.company_id = $1 AND T1.account_id = $2 AND T1.project_id = $3 AND T2.date >= $4 AND T2.date < $5 ORDER BY T2.date DESC`,
     [companyId, accountId, projectId, startDateInUtc, endDateInUtc]
   );
+
+  const fullTransactionAccounts = [];
+  for (const transactionAccount of transactionAccounts) {
+    let { rows: companies } = await pool.query(
+      `SELECT * FROM ${dbSchema}.company WHERE id = $1 AND company_id = $2`,
+      [item.location_id, companyId]
+    );
+    const company = locations[0];
+    fullTransactionAccounts.push({
+      "id": transactionAccount.id,
+      "transactionId": transactionAccount.transaction_id,
+      "companyId": transactionAccount.company_id,
+      "projectId": transactionAccount.project_id,
+      "accountId": transactionAccount.account_id,
+      "date": transactionAccount.date,
+      "narration": transactionAccount.amount,
+      "amount": transactionAccount.amount,
+      "dc": transactionAccount.dc,
+      "balance": transactionAccount.balance,
+      "voucherType": transactionAccount.voucher_type,
+      "voucherNo": transactionAccount.voucher_no,
+      "currencyId": transactionAccount.currency_id,
+      "salesmanId": transactionAccount.salesman_id,
+      "ref": transactionAccount.ref,
+      "invoice": transactionAccount.invoice,
+      "bank": transactionAccount.bank,
+      "chequeNo": transactionAccount.cheque_no,
+      "chequeDate": transactionAccount.cheque_date
+    })
+  }
 
   response.json({ transactionAccounts });
 });
