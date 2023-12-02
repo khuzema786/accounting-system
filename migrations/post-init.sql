@@ -636,19 +636,8 @@ VALUES
         31,
         '464c48c1-463c-425d-bdfa-85435524fcdc',
         3,
-        '{131}',
-        'Stock in Hand'
-    );
-
-INSERT INTO
-    account_app.account (id, company_id, parent_id, children_id, name)
-VALUES
-    (
-        131,
-        '464c48c1-463c-425d-bdfa-85435524fcdc',
-        31,
         NULL,
-        'Stock'
+        'Stock in Hand'
     );
 
 -- Income
@@ -880,6 +869,5 @@ CREATE TABLE account_app.transaction_item (
     PRIMARY KEY (id),
     FOREIGN KEY (transaction_id) REFERENCES account_app.transaction(id),
     FOREIGN KEY (company_id) REFERENCES account_app.company(id),
-    FOREIGN KEY (item_id) REFERENCES account_app.item(id),
-    FOREIGN KEY (location_id) REFERENCES account_app.location(id)
+    FOREIGN KEY (item_id) REFERENCES account_app.item(id)
 );

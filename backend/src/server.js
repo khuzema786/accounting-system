@@ -278,7 +278,7 @@ app.post("/invoice/create", verifyAuth, async (request, response) => {
   accounts.forEach(async ({ id: accountId, dc, narration, amount }) => {
     const balance = await (async () => {
       const { rows: accounts } = await pool.query(
-        `SELECT * FROM ${dbSchema}.account WHERE id = $2 and company_id = $3`,
+        `SELECT * FROM ${dbSchema}.account WHERE id = $1 and company_id = $2`,
         [accountId, companyId]
       );
       const balance = accounts[0].balance;
